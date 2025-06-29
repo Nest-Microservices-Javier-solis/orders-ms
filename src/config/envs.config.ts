@@ -5,18 +5,22 @@ dotenv.config();
 
 
 const envSchema = z.object({
-    PORT: z.coerce.number({message:'El puerto es obligatorio y debe ser un número'})
+    PORT: z.coerce.number({message:'El puerto es obligatorio y debe ser un número'}),
+    NATS_URL: z.array(z.string(), { message: 'La URL de NATS es obligatoria y debe ser una cadena de texto' }).min(1, { message: 'La URL de NATS no puede estar vacía' })
 })
 
 
-const envs = envSchema.safeParse(process.env)
+const envs = envSchema.parse({...process.env,
+    NATS_URL: process.env.NATS_URL?.split(',') 
+})
 
 
-if(!envs.success) throw new Error('Error con las variables de entorno')
+if(!envs) throw new Error('Error con las variables de entorno')
 
 
 export const envsConfig={
 
-    PORT: envs.data.PORT
+    PORT: envs.PORT,
+    NATS_URL: envs.NATS_URL
 
 }

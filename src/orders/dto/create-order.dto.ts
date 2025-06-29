@@ -1,22 +1,31 @@
-import { IsBoolean, IsEnum, IsNumber, IsOptional } from "class-validator"
 import { Type } from "class-transformer"
-import { OrderStatus } from "generated/prisma"
-import { OrderStatusList } from "../enum/order.enum"
+import { ArrayMinSize, IsArray, IsNumber, IsPositive, IsString, ValidateNested } from "class-validator"
 
+
+export class CreateProductDto {
+    @IsNumber()
+    @Type(() => Number)
+    id: number
+    @IsString()
+    name: string
+    @IsNumber()
+    @IsPositive()
+    price: number
+    @IsNumber()
+    @IsPositive()
+    quantity: number
+
+
+
+}
 
 
 export class CreateOrderDto {
-    @IsNumber({}, { message: 'El total debe ser numerico' })
-    @Type(() => Number)
-    totalAmount: number
-    @IsNumber({}, { message: 'El total de articulos debe ser numerico' })
-    @Type(() => Number)
-    totalItems: number
-    @IsEnum(OrderStatusList, { message: 'El estado debe ser uno de los siguientes: PENDING, COMPLETED, CANCELLED' })
-    status: OrderStatus = OrderStatus.PENDING
-    @IsBoolean()
-    @IsOptional()
-    paid: boolean = false
+    @IsArray()
+    @ArrayMinSize(1)
+    @ValidateNested({ each: true })
+    @Type(() => CreateProductDto)
+    items: CreateProductDto[]
 
 
 }

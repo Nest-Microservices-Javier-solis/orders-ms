@@ -12,7 +12,6 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  
 }
 
 enum OrderStatus {
@@ -20,16 +19,30 @@ enum OrderStatus {
   COMPLETED
   CANCELLED
 }
+
 model Order {
-  id          String   @id @default(uuid())
+  id          String @id @default(uuid())
   totalAmount Float
   totalItems  Int
-  
-  status      OrderStatus
-  paid        Boolean  @default(false)
-  paiddAt   DateTime?
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  status  OrderStatus 
+  paid    Boolean     @default(false)
+  paiddAt DateTime?
 
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  items     OrderItem[]
+}
+
+model OrderItem {
+  id        String @id @default(uuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Float
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
